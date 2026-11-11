@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GEP6 – Present Simple: Choose the Correct Sentence</title>
+<style>
+:root{--teal:#087f9b;--pink:#ed4d91;--ink:#24313a;--soft:#f3f8f8;--green:#16834a;--red:#c0392b}
+*{box-sizing:border-box}
+body{margin:0;background:#eef4f5;color:var(--ink);font-family:Arial,Helvetica,sans-serif;line-height:1.5}
+.wrap{max-width:900px;margin:28px auto;padding:18px}
+header{background:linear-gradient(120deg,#087f9b,#16a6b3);color:white;border-radius:20px;padding:26px 28px}
+header h1{margin:0 0 6px;font-size:clamp(24px,4vw,36px)}
+header p{margin:0;opacity:.95}
+.panel{background:white;border-radius:18px;padding:22px;margin-top:18px;box-shadow:0 5px 18px #18343d12}
+.topline{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}
+.progress{height:9px;background:#e7eeee;border-radius:20px;overflow:hidden;margin:14px 0 20px}
+.bar{height:100%;width:0;background:var(--pink);transition:width .2s}
+.tag{font-size:13px;font-weight:bold;color:var(--teal);background:#e5f5f6;padding:6px 10px;border-radius:30px}
+h2{font-size:21px;margin:4px 0 16px}
+.options{display:grid;gap:11px}
+.option{display:flex;gap:12px;align-items:flex-start;text-align:left;width:100%;border:2px solid #dce7e8;background:white;border-radius:12px;padding:14px;font-size:16px;cursor:pointer;color:var(--ink);transition:.15s}
+.option:hover:not(:disabled){border-color:var(--teal);background:#f6fcfc}
+.option .letter{font-weight:bold;color:var(--teal);min-width:24px}
+.option.correct{border-color:var(--green);background:#effaf3}
+.option.wrong{border-color:var(--red);background:#fff3f1}
+.option:disabled{cursor:default;opacity:1}
+.feedback{margin-top:16px;padding:13px 15px;border-radius:12px;display:none}
+.feedback.show{display:block}
+.feedback.good{background:#effaf3;color:#116438}
+.feedback.bad{background:#fff3f1;color:#963329}
+.controls{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+button.action{border:0;border-radius:10px;padding:12px 19px;font-size:15px;font-weight:bold;cursor:pointer}
+.primary{background:var(--teal);color:white}
+.secondary{background:#e9f0f1;color:var(--ink)}
+.action:disabled{opacity:.45;cursor:not-allowed}
+.result{text-align:center}
+.score{font-size:44px;font-weight:bold;color:var(--teal);margin:8px}
+.small{font-size:13px;color:#62737a}
+footer{text-align:center;color:#6c7c82;font-size:12px;padding:18px}
+@media(max-width:560px){.wrap{padding:12px;margin:8px auto}.panel{padding:16px}header{padding:21px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>Present Simple: Choose the Correct Sentence</h1>
+  <p>English File 1B · GEP6 · 20 multiple-choice questions</p>
+</header>
+<section class="panel" id="quiz">
+  <div class="topline"><span class="tag" id="topic">Positive & Negative</span><strong id="counter">Question 1 of 20</strong></div>
+  <div class="progress"><div class="bar" id="bar"></div></div>
+  <h2 id="prompt">Choose the grammatically correct sentence.</h2>
+  <div class="options" id="options"></div>
+  <div class="feedback" id="feedback" aria-live="polite"></div>
+  <div class="controls">
+    <button class="action primary" id="next" disabled>Next question →</button>
+    <button class="action secondary" id="restart">Start again</button>
+  </div>
+</section>
+<section class="panel result" id="result" hidden>
+  <h2>Quiz completed!</h2>
+  <div class="score" id="score"></div>
+  <p id="message"></p>
+  <button class="action primary" onclick="restartQuiz()">Try again</button>
+</section>
+<footer>Read each option carefully. You will get instant feedback and an explanation.</footer>
+</div>
+<script>
+const questions = [
+{topic:"Positive sentences",q:"Choose the correct sentence.",a:["My brother work in a bank.","My brother works in a bank.","My brother working in a bank."],c:1,e:"With he, she, or it, add -s or -es to the main verb: works."},
+{topic:"Negative sentences",q:"Choose the correct sentence.",a:["She don't like coffee.","She doesn't likes coffee.","She doesn't like coffee."],c:2,e:"Use doesn't + the base form of the verb: doesn't like."},
+{topic:"Positive sentences",q:"Choose the correct sentence.",a:["They lives near the school.","They live near the school.","They living near the school."],c:1,e:"With I, you, we, and they, use the base form: live."},
+{topic:"Questions",q:"Choose the correct question.",a:["Does your sister study English?","Do your sister studies English?","Does your sister studies English?"],c:0,e:"Use Does + he/she/it + base verb."},
+{topic:"Questions",q:"Choose the correct question.",a:["Where your parents live?","Where do your parents live?","Where does your parents live?"],c:1,e:"Use do with plural subjects such as your parents."},
+{topic:"Spelling rules",q:"Choose the correct sentence.",a:["He studys every evening.","He study every evening.","He studies every evening."],c:2,e:"For a consonant + y, change y to -ies: study → studies."},
+{topic:"Spelling rules",q:"Choose the correct sentence.",a:["She watchs TV after dinner.","She watches TV after dinner.","She watch TV after dinner."],c:1,e:"Add -es to verbs ending in -ch, -sh, -s, -x, or -z: watches."},
+{topic:"Spelling rules",q:"Choose the correct sentence.",a:["My father go to work by car.","My father goes to work by car.","My father gos to work by car."],c:1,e:"Go changes to goes with he, she, or it."},
+{topic:"Spelling rules",q:"Choose the correct sentence.",a:["My friend have two dogs.","My friend haves two dogs.","My friend has two dogs."],c:2,e:"Have changes to has with he, she, or it."},
+{topic:"Questions",q:"Choose the correct question.",a:["What time does the class starts?","What time do the class start?","What time does the class start?"],c:2,e:"Use does with the singular subject the class, followed by the base verb start."},
+{topic:"Adverbs of frequency",q:"Choose the correct sentence.",a:["I usually walk to school.","I walk usually to school.","Usually I walk to school every usually."],c:0,e:"Adverbs of frequency usually go before the main verb."},
+{topic:"Adverbs of frequency",q:"Choose the correct sentence.",a:["He is always friendly.","He always is friendly.","He friendly is always."],c:0,e:"With the verb be, the adverb of frequency goes after am/is/are."},
+{topic:"Adverbs of frequency",q:"Choose the correct sentence.",a:["We go never shopping on Sundays.","We never go shopping on Sundays.","We don't never go shopping on Sundays."],c:1,e:"Never goes before the main verb. Do not use don't with never."},
+{topic:"Adverbs of frequency",q:"Choose the correct sentence.",a:["She doesn't usually eat breakfast.","She doesn't eat usually breakfast.","She don't usually eats breakfast."],c:0,e:"Usually goes before the main verb. After doesn't, use the base form eat."},
+{topic:"Expressions of frequency",q:"Choose the correct sentence.",a:["I play football twice a week.","I twice a week play football.","I play twice football a week."],c:0,e:"Expressions such as twice a week usually go at the end of the sentence."},
+{topic:"Expressions of frequency",q:"Choose the correct sentence.",a:["They have English every day at 8.","They every day have English at 8.","They have every day English at 8."],c:0,e:"Every day usually goes at the end of the sentence or after the time phrase."},
+{topic:"Questions",q:"Choose the correct question.",a:["How often you visit your grandparents?","How often does you visit your grandparents?","How often do you visit your grandparents?"],c:2,e:"Use do + you + base verb in a Present Simple question."},
+{topic:"Negative sentences",q:"Choose the correct sentence.",a:["My neighbours doesn't have children.","My neighbours don't have children.","My neighbours don't has children."],c:1,e:"Use don't with they/plural subjects, followed by the base verb have."},
+{topic:"Adverbs of frequency",q:"Choose the correct sentence.",a:["Lina hardly ever is late.","Lina is hardly ever late.","Lina hardly is ever late."],c:1,e:"With be, put the frequency expression after the verb: is hardly ever."},
+{topic:"Mixed review",q:"Choose the correct sentence.",a:["Does he often goes to the gym?","Do he often go to the gym?","Does he often go to the gym?"],c:2,e:"Use Does with he, and keep the main verb in its base form: go."}
+];
+let current=0, score=0, answered=false;
+const $=id=>document.getElementById(id);
+function render(){
+ const q=questions[current]; answered=false;
+ $("topic").textContent=q.topic;
+ $("counter").textContent=`Question ${current+1} of ${questions.length}`;
+ $("bar").style.width=`${current/questions.length*100}%`;
+ $("prompt").textContent=q.q;
+ $("options").innerHTML="";
+ $("feedback").className="feedback"; $("feedback").textContent="";
+ $("next").disabled=true; $("next").textContent=current===questions.length-1?"See results":"Next question →";
+ q.a.forEach((txt,i)=>{
+   const b=document.createElement("button"); b.className="option";
+   b.innerHTML=`<span class="letter">${"ABC"[i]}.</span><span>${txt}</span>`;
+   b.onclick=()=>choose(i); $("options").appendChild(b);
+ });
+}
+function choose(i){
+ if(answered)return; answered=true;
+ const q=questions[current], buttons=[...$("options").children];
+ buttons.forEach((b,j)=>{b.disabled=true;if(j===q.c)b.classList.add("correct");else if(j===i)b.classList.add("wrong")});
+ const good=i===q.c;if(good)score++;
+ $("feedback").className="feedback show "+(good?"good":"bad");
+ $("feedback").innerHTML=`<strong>${good?"Correct!":"Not quite."}</strong> ${q.e}`;
+ $("next").disabled=false;
+}
+function next(){
+ if(!answered)return;
+ current++;
+ if(current<questions.length)render(); else finish();
+}
+function finish(){
+ $("quiz").hidden=true;$("result").hidden=false;
+ $("bar").style.width="100%";
+ $("score").textContent=`${score} / ${questions.length}`;
+ $("message").textContent=score>=18?"Excellent work! You have a strong understanding of the Present Simple.":score>=14?"Good job! Review the explanations for the questions you missed.":"Keep practising! Try again and focus on the grammar patterns.";
+}
+function restartQuiz(){current=0;score=0;$("quiz").hidden=false;$("result").hidden=true;render()}
+$("next").onclick=next;$("restart").onclick=restartQuiz;
+render();
+</script>
+</body>
+</html>
